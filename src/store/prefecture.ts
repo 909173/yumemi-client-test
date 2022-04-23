@@ -39,5 +39,6 @@ const prefectureStore = {
   setPrefectures,
 }
 export default prefectureStore
-export const prefectureStoreKey: InjectionKey<typeof prefectureStore> =
+export type PrefectureStoreType = typeof prefectureStore
+export const prefectureStoreKey: InjectionKey<PrefectureStoreType> =
   Symbol("prefecture")

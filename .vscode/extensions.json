@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "johnsoncodehk.volar",
+    "EditorConfig.EditorConfig",
+  ],
+  "unwantedRecommendations": [
+    "octref.vetur",
+  ]
+}

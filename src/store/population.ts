@@ -21,7 +21,7 @@ const addPopulation = (arg: PopulationDisplay) => {
     if (!state.c3graphData) throw new Error("graph data is not initialized")
     state.c3graphData.load({
       columns: [
-        ["year", ...arg.data.map((x) => x.year)],
+        ["year", ...arg.data.map((x) => `${x.year}`)],
         [`${arg.prefName}`, ...arg.data.map((x) => x.value)],
       ],
     })
@@ -73,5 +73,6 @@ const populationStore = {
   setGraph,
 }
 export default populationStore
-export const populationStoreKey: InjectionKey<typeof populationStore> =
+export type PopulationStoreType = typeof populationStore
+export const populationStoreKey: InjectionKey<PopulationStoreType> =
   Symbol("population")

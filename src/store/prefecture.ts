@@ -6,6 +6,10 @@ const state = reactive<{ prefectures: PrefectureDisplay[] }>({
   prefectures: [],
 })
 
+const clearState = () => {
+  state.prefectures = []
+}
+
 const setPrefectures = (prefectures: PrefectureDisplay[]) =>
   (state.prefectures = prefectures)
 
@@ -20,23 +24,20 @@ const changeCheckPrefecture = (arg: { prefCode: number; isCheck: boolean }) => {
   )
 }
 const fetchPrefecture = async () => {
-  try {
-    const response = await axiosInstance.get<PrefectureResponse>("/prefectures")
-    setPrefectures(
-      response.data.result.map((x) => ({
-        ...x,
-        isCheck: false,
-      }))
-    )
-  } catch (err) {
-    console.error(err)
-  }
+  const response = await axiosInstance.get<PrefectureResponse>("/prefectures")
+  setPrefectures(
+    response.data.result.map((x) => ({
+      ...x,
+      isCheck: false,
+    }))
+  )
 }
 const prefectureStore = {
   state: readonly(state),
   fetchPrefecture,
   changeCheckPrefecture,
   setPrefectures,
+  clearState,
 }
 export default prefectureStore
 export type PrefectureStoreType = typeof prefectureStore

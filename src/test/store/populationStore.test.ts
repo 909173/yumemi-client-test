@@ -1,10 +1,15 @@
+import { AxiosResponse } from "axios"
 import { ChartAPI } from "c3"
 import { afterEach, describe, expect, test, vi } from "vitest"
 import populationStore from "../../store/population"
+import { PopulationResponse } from "../../types/api"
 import { PopulationDisplay } from "../../types/population"
-import axiosInstance from "../../function/util/axiosSettings"
+import { Prefecture } from "../../types/prefecture"
+import axiosInstance from "../../util/axiosSettings"
+// import axiosInstance from  "../../util/axiosSettings"
 afterEach(() => {
   populationStore.clearState()
+  vi.clearAllMocks()
 })
 describe("clearState テスト", () => {
   test("正常テスト", () => {
@@ -103,4 +108,119 @@ describe("addPopulation テスト", () => {
   })
 })
 
-describe("disposePopulation テスト", () => {})
+describe("disposePopulation テスト", () => {
+  test("正常系テスト", () => {
+    const c3Graph: ChartAPI = {
+      data: {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      unload: (_: string[]) => {},
+    } as ChartAPI
+    const spy = vi.spyOn(c3Graph, "unload")
+    populationStore.setGraph(c3Graph)
+    const population: PopulationDisplay[] = [
+      {
+        data: [],
+        prefCode: 0,
+        prefName: "北海道",
+      },
+    ]
+    populationStore.setPopulation(population)
+    populationStore.disposePopulation(population[0])
+    expect(populationStore.state.population).toEqual([])
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith([population[0].prefName])
+  })
+  test("グラフデータ非初期化", () => {
+    const population: PopulationDisplay[] = [
+      {
+        data: [],
+        prefCode: 0,
+        prefName: "北海道",
+      },
+    ]
+    populationStore.setPopulation(population)
+    expect(() => populationStore.disposePopulation(population[0])).toThrowError(
+      "graph data is not initialized"
+    )
+  })
+})
+
+describe("人口取得イベントテスト", () => {
+  test("正常系", async () => {
+    const axiosInstanceMock = axiosInstance
+    const populationResponse: PopulationResponse = {
+      message: "message",
+      result: {
+        boundaryYear: 2022,
+        data: [
+          {
+            label: "総人口",
+            data: [
+              {
+                value: 200,
+                year: 2022,
+              },
+            ],
+          },
+        ],
+      },
+    }
+    axiosInstanceMock.get = vi.fn().mockResolvedValue({
+      status: 200,
+      data: populationResponse,
+    } as AxiosResponse<PopulationResponse>)
+    const c3Graph = {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      load: (_: { columns: [string, ...any[]] }) => {},
+    } as ChartAPI
+    populationStore.setGraph(c3Graph)
+    const pref: Prefecture = {
+      prefCode: 0,
+      prefName: "北海道",
+    }
+    await populationStore.fetchPopulation(pref)
+    expect(axiosInstanceMock.get).toHaveBeenCalledWith(
+      "population/composition/perYear",
+      {
+        params: {
+          prefCode: pref.prefCode,
+        },
+      }
+    )
+  })
+  test("総人口なし", async () => {
+    const axiosInstanceMock = axiosInstance
+    const populationResponse: PopulationResponse = {
+      message: "message",
+      result: {
+        boundaryYear: 2022,
+        data: [
+          {
+            label: "生産年齢人口",
+            data: [
+              {
+                value: 200,
+                year: 2022,
+              },
+            ],
+          },
+        ],
+      },
+    }
+    axiosInstanceMock.get = vi.fn().mockResolvedValue({
+      status: 200,
+      data: populationResponse,
+    } as AxiosResponse<PopulationResponse>)
+    const c3Graph = {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      load: (_: { columns: [string, ...any[]] }) => {},
+    } as ChartAPI
+    populationStore.setGraph(c3Graph)
+    const pref: Prefecture = {
+      prefCode: 0,
+      prefName: "北海道",
+    }
+    const promiseFunc = populationStore.fetchPopulation(pref)
+    await expect(promiseFunc).rejects.toThrow("total population data not found")
+  })
+})

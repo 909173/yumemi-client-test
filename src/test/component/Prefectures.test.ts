@@ -1,20 +1,20 @@
 import { mount } from "@vue/test-utils"
 import { describe, test, expect, vi, afterEach } from "vitest"
 import { reactive } from "vue"
-import PrefecturesVue from "../components/Prefectures.vue"
-import PrefectureVue from "../components/Prefectures/Prefecture.vue"
+import PrefecturesVue from "../../components/Prefectures.vue"
+import PrefectureVue from "../../components/Prefectures/Prefecture.vue"
 import prefectureStore, {
   prefectureStoreKey,
   PrefectureStoreType,
-} from "../store/prefecture"
+} from "../../store/prefecture"
 import populationStore, {
   populationStoreKey,
   PopulationStoreType,
-} from "../store/population"
-import { Prefecture, PrefectureDisplay } from "../types/prefecture"
+} from "../../store/population"
+import { Prefecture, PrefectureDisplay } from "../../types/prefecture"
 describe("Prefectures importテスト", () => {
   test("Prefectures import テスト", async () => {
-    const cmp = await import("../components/Prefectures.vue")
+    const cmp = await import("../../components/Prefectures.vue")
     expect(cmp).toBeDefined()
   })
 })
@@ -145,7 +145,7 @@ describe("画面イベントテスト", () => {
 describe("ストアロード失敗", () => {
   test("prefectureStoreロード失敗テスト", () => {
     expect(() => mount(PrefecturesVue)).toThrowError(
-      "prefecture state not found"
+      "prefecture store not found"
     )
   })
   test("populationStoreロード失敗テスト", () => {
@@ -157,6 +157,6 @@ describe("ストアロード失敗", () => {
           },
         },
       })
-    ).toThrowError("population state not")
+    ).toThrowError("population store not")
   })
 })

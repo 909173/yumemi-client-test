@@ -1,10 +1,10 @@
 import { mount } from "@vue/test-utils"
 import { test, expect, describe } from "vitest"
-import HeaderContainer from "../components/HeaderContainer.vue"
+import HeaderContainer from "../../components/HeaderContainer.vue"
 
 describe("importテスト", () => {
   test("ヘッダーコンポーネントimportテスト", async () => {
-    const cmp = await import("../components/HeaderContainer.vue")
+    const cmp = await import("../../components/HeaderContainer.vue")
     expect(cmp).toBeDefined()
   })
 })

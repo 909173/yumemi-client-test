@@ -42,11 +42,6 @@ describe("グラフデータセットイベント", () => {
     vi.restoreAllMocks()
   })
   test("グラフデータセットテスト", () => {
-    // const populationMock: PopulationStoreType = {
-    //   ...populationStore,
-    //   // eslint-disable-next-line @typescript-eslint/no-empty-function
-    //   setGraph: (_: ChartAPI) => {},
-    // }
     const spy = vi.spyOn(populationStore, "setGraph")
     const wrapper = mount(PopulationVue, {
       global: {

@@ -1,21 +1,30 @@
-# Vue 3 + TypeScript + Vite
+# Vite + Vue + TypeScript 人口グラフ表示アプリケーション
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## アプリ概要
 
-## Recommended IDE Setup
+RESAS APIを用いた県ごとの人口推移グラフを表示するアプリケーション
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+## 試験概要
 
-## Type Support For `.vue` Imports in TS
+[ゆめみ フロントエンドコーディング試験](https://notion.yumemi.co.jp/0e9ef27b55704d7882aab55cc86c999d)
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+## 選択技術
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+- ビルド: Vite
+- フロントエンドフレームワーク: Vue3
+- テストツール: Vitest
+- APIリクエスト: Axios
+- Linter: Prettier + ESLint + EditorConfig
+- デプロイ先: Netlify
+  - ミドルウェアサーバー: Netlify Lambda
+- CSSフレームワーク: なし
+- グラフ表示: C3.js
+## 実行方法
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
-
-
-## envについて
+```cmd
+npm install
+npm run dev 
+```
+### envについて
 
 .env.exampleを参考に.envファイルにRESASのAPIキーをセットしてください。

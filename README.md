@@ -2,6 +2,7 @@
 
 ## アプリ概要
 
+[デプロイ済みアプリ](https://sprightly-sfogliatella-200517.netlify.app)
 RESAS APIを用いた県ごとの人口推移グラフを表示するアプリケーション
 
 ## 試験概要

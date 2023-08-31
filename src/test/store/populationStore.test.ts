@@ -1,18 +1,22 @@
 import { AxiosResponse } from "axios"
 import { ChartAPI } from "c3"
-import { afterEach, describe, expect, test, vi } from "vitest"
-import populationStore from "../../store/population"
+import { createPinia, setActivePinia } from "pinia"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { usePopulationStore } from "../../store/population"
 import { PopulationResponse } from "../../types/api"
 import { PopulationDisplay } from "../../types/population"
 import { Prefecture } from "../../types/prefecture"
 import axiosInstance from "../../util/axiosSettings"
 // import axiosInstance from  "../../util/axiosSettings"
+beforeEach(() => {
+  setActivePinia(createPinia())
+})
 afterEach(() => {
-  populationStore.clearState()
   vi.clearAllMocks()
 })
 describe("clearState テスト", () => {
   test("正常テスト", () => {
+    const populationStore = usePopulationStore()
     const population: PopulationDisplay[] = [
       {
         data: [],
@@ -24,14 +28,20 @@ describe("clearState テスト", () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       load: (_: { columns: [string, ...any[]] }) => {},
     } as ChartAPI
-    populationStore.setGraph(c3graphData)
-    populationStore.setPopulation(population)
-    expect(populationStore.state).toEqual({
+    populationStore.c3graphData = c3graphData
+    populationStore.population = population
+    expect({
+      c3graphData: populationStore.c3graphData,
+      population: populationStore.population,
+    }).toEqual({
       c3graphData,
       population,
     })
     populationStore.clearState()
-    expect(populationStore.state).toEqual({
+    expect({
+      c3graphData: populationStore.c3graphData,
+      population: populationStore.population,
+    }).toEqual({
       c3GraphData: undefined,
       population: [],
     })
@@ -46,18 +56,22 @@ describe("setPopulation テスト", () => {
     },
   ]
   test.each([[newPopulations], [[]]])("正常テスト", (arg) => {
-    populationStore.setPopulation(arg)
-    expect(populationStore.state.population).toEqual(arg)
+    const populationStore = usePopulationStore()
+
+    populationStore.population = arg
+    expect(populationStore.population).toEqual(arg)
   })
 })
 
 describe("setGraph テスト", () => {
   test("正常テスト", () => {
+    const populationStore = usePopulationStore()
+
     const newC3Graph: ChartAPI = {
       data: {},
     } as ChartAPI // FIXME: c3jsのgenerateがjsdom, happy-domで呼び出せないため
-    populationStore.setGraph(newC3Graph)
-    expect(populationStore.state.c3graphData).toEqual(newC3Graph)
+    populationStore.c3graphData = newC3Graph
+    expect(populationStore.c3graphData).toEqual(newC3Graph)
   })
 })
 
@@ -76,14 +90,16 @@ describe("addPopulation テスト", () => {
     prefName: "北海道",
   }
   test("正常テスト", () => {
+    const populationStore = usePopulationStore()
+
     const c3Graph = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       load: (_: { columns: [string, ...any[]] }) => {},
     } as ChartAPI
     const spy = vi.spyOn(c3Graph, "load")
-    populationStore.setGraph(c3Graph)
+    populationStore.c3graphData = c3Graph
     populationStore.addPopulation(newPopulation)
-    expect(populationStore.state.population).toEqual([newPopulation])
+    expect(populationStore.population).toEqual([newPopulation])
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith({
       columns: [
@@ -96,6 +112,8 @@ describe("addPopulation テスト", () => {
     })
   })
   test("c3データ非存在", () => {
+    const populationStore = usePopulationStore()
+
     const c3Graph = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       load: (_: { columns: [string, ...any[]] }) => {},
@@ -110,13 +128,15 @@ describe("addPopulation テスト", () => {
 
 describe("disposePopulation テスト", () => {
   test("正常系テスト", () => {
+    const populationStore = usePopulationStore()
+
     const c3Graph: ChartAPI = {
       data: {},
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       unload: (_: string[]) => {},
     } as ChartAPI
     const spy = vi.spyOn(c3Graph, "unload")
-    populationStore.setGraph(c3Graph)
+    populationStore.c3graphData = c3Graph
     const population: PopulationDisplay[] = [
       {
         data: [],
@@ -124,13 +144,15 @@ describe("disposePopulation テスト", () => {
         prefName: "北海道",
       },
     ]
-    populationStore.setPopulation(population)
+    populationStore.population = population
     populationStore.disposePopulation(population[0])
-    expect(populationStore.state.population).toEqual([])
+    expect(populationStore.population).toEqual([])
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith([population[0].prefName])
   })
   test("グラフデータ非初期化", () => {
+    const populationStore = usePopulationStore()
+
     const population: PopulationDisplay[] = [
       {
         data: [],
@@ -138,7 +160,7 @@ describe("disposePopulation テスト", () => {
         prefName: "北海道",
       },
     ]
-    populationStore.setPopulation(population)
+    populationStore.population = population
     expect(() => populationStore.disposePopulation(population[0])).toThrowError(
       "graph data is not initialized"
     )
@@ -147,6 +169,8 @@ describe("disposePopulation テスト", () => {
 
 describe("人口取得イベントテスト", () => {
   test("正常系", async () => {
+    const populationStore = usePopulationStore()
+
     const axiosInstanceMock = axiosInstance
     const populationResponse: PopulationResponse = {
       message: "message",
@@ -173,7 +197,7 @@ describe("人口取得イベントテスト", () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       load: (_: { columns: [string, ...any[]] }) => {},
     } as ChartAPI
-    populationStore.setGraph(c3Graph)
+    populationStore.c3graphData = c3Graph
     const pref: Prefecture = {
       prefCode: 0,
       prefName: "北海道",
@@ -189,6 +213,8 @@ describe("人口取得イベントテスト", () => {
     )
   })
   test("総人口なし", async () => {
+    const populationStore = usePopulationStore()
+
     const axiosInstanceMock = axiosInstance
     const populationResponse: PopulationResponse = {
       message: "message",
@@ -215,7 +241,7 @@ describe("人口取得イベントテスト", () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       load: (_: { columns: [string, ...any[]] }) => {},
     } as ChartAPI
-    populationStore.setGraph(c3Graph)
+    populationStore.c3graphData = c3Graph
     const pref: Prefecture = {
       prefCode: 0,
       prefName: "北海道",

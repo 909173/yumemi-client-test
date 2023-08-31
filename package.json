@@ -10,19 +10,23 @@
     "build:client": "vue-tsc --noEmit && vite build",
     "build:fnc": "netlify-lambda build lambda/",
     "preview": "vite preview",
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
+    "test": "run-p dev:fnc test:unit",
+    "test:unit": "sleep 4 && vitest",
+    "coverage": "run-p dev:fnc test:coverage",
+    "test:coverage": "sleep 4 && vitest --coverage",
     "lint": "eslint --ext .ts,.js,.vue ."
   },
   "dependencies": {
     "axios": "^0.26.1",
     "c3": "^0.7.20",
     "dotenv": "^16.0.1",
+    "pinia": "^2.1.6",
     "vue": "^3.2.25"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.17.12",
     "@nuxtjs/eslint-config-typescript": "^9.0.0",
+    "@pinia/testing": "^0.1.3",
     "@types/aws-lambda": "^8.10.97",
     "@types/c3": "^0.7.8",
     "@typescript-eslint/eslint-plugin": "^5.10.0",

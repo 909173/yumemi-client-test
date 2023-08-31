@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import "c3/c3.min.css"
 import { ChartConfiguration, generate } from "c3"
-import { inject, onMounted } from "vue"
-import { populationStoreKey } from "../store/population"
-const populationStore = inject(populationStoreKey)
-if (!populationStore) throw new Error("population store not found")
+import { onMounted, ref } from "vue"
+import { usePopulationStore } from "../store/population"
 
-const c3GraphConfig: ChartConfiguration = {
+const populationStore = usePopulationStore()
+
+const c3GraphConfig = ref<ChartConfiguration>({
   bindto: "#c3-graph",
   data: {
     x: "year",
@@ -32,10 +32,13 @@ const c3GraphConfig: ChartConfiguration = {
       },
     },
   },
+})
+function initC3Graph() {
+  const graphData = generate(c3GraphConfig.value)
+  populationStore.c3graphData = graphData
 }
 onMounted(() => {
-  const graphData = generate(c3GraphConfig)
-  populationStore.setGraph(graphData)
+  initC3Graph()
 })
 </script>
 <template>

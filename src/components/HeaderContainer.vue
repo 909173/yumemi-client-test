@@ -1,3 +1,4 @@
+<script setup></script>
 <template>
   <header>
     <div class="header-container">

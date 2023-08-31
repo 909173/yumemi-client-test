@@ -1,45 +1,30 @@
-import { InjectionKey, reactive, readonly } from "vue"
+import { ref } from "vue"
+import { defineStore } from "pinia"
 import { PrefectureDisplay } from "../types/prefecture"
 import { PrefectureResponse } from "../types/api"
 import axiosInstance from "../util/axiosSettings"
-const state = reactive<{ prefectures: PrefectureDisplay[] }>({
-  prefectures: [],
-})
 
-const clearState = () => {
-  state.prefectures = []
-}
-
-const setPrefectures = (prefectures: PrefectureDisplay[]) =>
-  (state.prefectures = prefectures)
-
-const changeCheckPrefecture = (arg: { prefCode: number; isCheck: boolean }) => {
-  state.prefectures = state.prefectures.map((x) =>
-    x.prefCode === arg.prefCode
-      ? {
-          ...x,
-          isCheck: arg.isCheck,
-        }
-      : x
-  )
-}
-const fetchPrefecture = async () => {
-  const response = await axiosInstance.get<PrefectureResponse>("/prefectures")
-  setPrefectures(
-    response.data.result.map((x) => ({
+export const usePrefectureStore = defineStore("prefecture", () => {
+  const prefectures = ref<PrefectureDisplay[]>([])
+  function changeCheckPrefecture(state: {
+    prefCode: number
+    isCheck: boolean
+  }) {
+    prefectures.value = prefectures.value.map((x) =>
+      x.prefCode === state.prefCode
+        ? {
+            ...x,
+            isCheck: state.isCheck,
+          }
+        : x
+    )
+  }
+  async function fetchPrefecture() {
+    const response = await axiosInstance.get<PrefectureResponse>("/prefectures")
+    prefectures.value = response.data.result.map((x) => ({
       ...x,
       isCheck: false,
     }))
-  )
-}
-const prefectureStore = {
-  state: readonly(state),
-  fetchPrefecture,
-  changeCheckPrefecture,
-  setPrefectures,
-  clearState,
-}
-export default prefectureStore
-export type PrefectureStoreType = typeof prefectureStore
-export const prefectureStoreKey: InjectionKey<PrefectureStoreType> =
-  Symbol("prefecture")
+  }
+  return { prefectures, changeCheckPrefecture, fetchPrefecture }
+})

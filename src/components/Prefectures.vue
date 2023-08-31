@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { inject } from "vue"
-import { populationStoreKey } from "../store/population"
 import { PrefectureDisplay } from "../types/prefecture"
-import { prefectureStoreKey } from "../store/prefecture"
+import { usePrefectureStore } from "../store/prefecture"
+import { usePopulationStore } from "../store/population"
 import PrefectureVue from "./Prefectures/Prefecture.vue"
-const prefectureStore = inject(prefectureStoreKey)
-const populationStore = inject(populationStoreKey)
-if (!prefectureStore) throw new Error("prefecture store not found")
-if (!populationStore) throw new Error("population store not found")
+const prefectureStore = usePrefectureStore()
+const populationStore = usePopulationStore()
 prefectureStore.fetchPrefecture()
 const handleChangeCheck = (arg: PrefectureDisplay) => {
   prefectureStore.changeCheckPrefecture(arg)
@@ -20,7 +17,7 @@ const handleChangeCheck = (arg: PrefectureDisplay) => {
     <h3>都道府県</h3>
     <div class="prefecture-flex">
       <PrefectureVue
-        v-for="pref in prefectureStore.state.prefectures"
+        v-for="pref in prefectureStore.prefectures"
         :key="pref.prefCode"
         :prefecture="pref"
         @check="handleChangeCheck"

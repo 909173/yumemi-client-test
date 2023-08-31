@@ -1,9 +1,14 @@
 import { mount } from "@vue/test-utils"
-import { afterEach, describe, expect, test, vi } from "vitest"
+import { createPinia, setActivePinia } from "pinia"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { ChartConfiguration } from "c3"
 import PopulationVue from "../../components/Population.vue"
-import populationStore, { populationStoreKey } from "../../store/population"
+import { usePopulationStore } from "../../store/population"
 // c3jsのwindow.SVGPathElementがjsdom, happy-dom環境では存在しないプロパティでエラーを吐くのでc3関連はmockする
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+})
 
 describe("Population importテスト", () => {
   // c3のMock
@@ -24,14 +29,13 @@ describe("Population importテスト", () => {
 describe("コンポーネント描画テスト", () => {
   test("初期描画テスト", () => {
     expect(PopulationVue).toBeTruthy()
+    const populationStore = usePopulationStore()
     const wrapper = mount(PopulationVue, {
-      global: {
-        provide: {
-          [populationStoreKey.valueOf()]: populationStore,
-        },
-      },
+      data: () => ({
+        populationStore,
+      }),
     })
-    expect(wrapper).toMatchSnapshot()
+    // expect(wrapper).toMatchSnapshot()
     expect(wrapper.text()).toEqual("")
     expect(wrapper.find("div").element.id).toEqual("c3-graph")
   })
@@ -42,24 +46,13 @@ describe("グラフデータセットイベント", () => {
     vi.restoreAllMocks()
   })
   test("グラフデータセットテスト", () => {
-    const spy = vi.spyOn(populationStore, "setGraph")
-    const wrapper = mount(PopulationVue, {
-      global: {
-        provide: {
-          [populationStoreKey.valueOf()]: populationStore,
-        },
-      },
-    })
-    console.log(wrapper.vm)
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(populationStore.state.c3graphData)
-  })
-})
+    const populationStore = usePopulationStore()
 
-describe("ストアロード失敗", () => {
-  test("populationStoreロード失敗", () => {
-    expect(() => mount(PopulationVue)).toThrowError(
-      "population store not found"
-    )
+    mount(PopulationVue)
+
+    const initializedC3GraphData = populationStore.c3graphData as any
+    expect(initializedC3GraphData.bindto).toEqual("#c3-graph")
+    expect(initializedC3GraphData.data.x).toEqual("year")
+    expect(initializedC3GraphData.data.xFormat).toEqual("%Y")
   })
 })

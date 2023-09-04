@@ -4,9 +4,8 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest"
 import PrefecturesVue from "../../components/Prefectures.vue"
 import PrefectureVue from "../../components/Prefectures/Prefecture.vue"
 
-import { Prefecture, PrefectureDisplay } from "../../types/prefecture"
+import { PrefectureDisplay } from "../../types/prefecture"
 import { usePrefectureStore } from "../../store/prefecture"
-import { usePopulationStore } from "../../store/population"
 beforeEach(() => {
   setActivePinia(createPinia())
 })
@@ -39,13 +38,14 @@ describe("コンポーネント描画テスト", () => {
     const prefectureStore = usePrefectureStore()
     prefectureStore.prefectures = prefectures
     const wrapper = mount(PrefecturesVue, {
-      data: () => {
-        return {
-          prefectures,
-        }
+      props: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+        handleChangeCheck: (arg: PrefectureDisplay) => {},
+        prefectures,
       },
     })
     expect(wrapper.html()).toMatchSnapshot()
+    console.log(wrapper.text())
     expect(wrapper.text()).contain(
       ["都道府県", ...prefectures.map((x) => x.prefName)].reduce(
         (a, b) => `${a}${b}`
@@ -60,8 +60,6 @@ describe("画面イベントテスト", () => {
   })
   test("チェックONイベント", async () => {
     // 県のモックデータ
-    const populationStore = usePopulationStore()
-    const prefectureStore = usePrefectureStore()
     const prefectures: PrefectureDisplay[] = [
       {
         prefCode: 0,
@@ -69,23 +67,19 @@ describe("画面イベントテスト", () => {
         prefName: "北海道",
       },
     ]
-    prefectureStore.prefectures = prefectures
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    populationStore.fetchPopulation = async (_: Prefecture) => {}
-    const spy = vi.spyOn(populationStore, "fetchPopulation")
+    const func = vi.fn()
     const wrapper = mount(PrefecturesVue, {
-      data: () => ({
+      props: {
         prefectures,
-        populationStore,
-      }),
+        handleChangeCheck: func,
+      },
     })
     await wrapper.getComponent(PrefectureVue).vm.$emit("check", prefectures[0])
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(prefectures[0])
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenCalledWith(prefectures[0])
   })
   test("チェックオフイベント", async () => {
-    const populationStore = usePopulationStore()
-    const prefectureStore = usePrefectureStore()
     // 県のモックデータ
     const prefectures: PrefectureDisplay[] = [
       {
@@ -94,20 +88,18 @@ describe("画面イベントテスト", () => {
         prefName: "北海道",
       },
     ]
-    prefectureStore.prefectures = prefectures
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    populationStore.disposePopulation = async (_: Prefecture) => {}
-    const spy = vi.spyOn(populationStore, "disposePopulation")
+    const func = vi.fn()
     const wrapper = mount(PrefecturesVue, {
-      data: () => ({
+      props: {
         prefectures,
-        populationStore,
-      }),
+        handleChangeCheck: func,
+      },
     })
 
     await wrapper.getComponent(PrefectureVue).vm.$emit("check", prefectures[0])
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(prefectures[0])
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenCalledWith(prefectures[0])
   })
 })

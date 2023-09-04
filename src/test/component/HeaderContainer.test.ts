@@ -12,7 +12,7 @@ describe("コンポーネント描画テスト", () => {
   test("ヘッダー初期表示", () => {
     expect(HeaderContainer).toBeTruthy()
     const wrapper = mount(HeaderContainer, {})
-    expect(wrapper.text()).toEqual("Title")
+    expect(wrapper.text()).toEqual("Title都道府県データ一覧除外県一覧")
     expect(wrapper.get("header")).toBeTruthy()
     expect(wrapper.html()).toMatchSnapshot()
   })

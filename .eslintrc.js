@@ -9,7 +9,6 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "@nuxtjs/eslint-config-typescript",
     "plugin:vue/vue3-recommended",
-    "plugin:prettier/recommended",
     "prettier",
   ],
   parserOptions: {
@@ -20,6 +19,7 @@ module.exports = {
   plugins: ["vue", "@typescript-eslint"],
   rules: {
     "no-console": "off",
+    "import/no-absolute-path": "off",
     "vue/no-multiple-template-root": "off",
   },
 }

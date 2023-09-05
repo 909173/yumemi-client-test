@@ -15,7 +15,7 @@ prefectureStore.fetchPrefecture()
 </script>
 <template>
   <Prefectures
-    :prefectures="prefectureStore.prefectures"
+    :prefectures="prefectureStore.displayPrefectures"
     :handle-change-check="handleChangeCheck"
   />
   <Population />
